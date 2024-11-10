@@ -93,6 +93,23 @@
             padding: 5px;
             border-radius: 5px;
         }
+
+        .input-container {
+            margin-bottom: 10px;
+            width: 100%; /* Make sure the parent div is 100% width */
+        }
+
+        .input-container input {
+            width: 80%;
+            padding: 8px;
+            box-sizing: border-box;
+            margin-right: 2px;
+        }
+
+        #addSkillBtn {
+            margin-top: 10px;
+            padding: 8px 16px;
+        }
     </style>
 </head>
 <body>
@@ -104,6 +121,16 @@
             <div id="file-list">
                 <table width="100%"></table>
             </div>
+
+            <h1>Input Required Skills</h1>
+            <div id="skillsContainer">
+                <div class="input-container">
+                    <input type="text" name="skills[]" placeholder="Enter skill" required/>
+                    <button type="button" class="delete-btn">Delete</button>
+                </div>
+            </div>
+
+            <button type="button" id="addSkillBtn">Add Skill</button>
             <button type="submit">Upload Files</button>
         </form>
 
@@ -145,6 +172,34 @@
                 fileRow.appendChild(fileItem2);
                 fileListContainer.appendChild(fileRow);
             }
+        });
+
+        const skillsContainer = document.getElementById('skillsContainer');
+        const addSkillBtn = document.getElementById('addSkillBtn');
+
+        addSkillBtn.addEventListener('click', function() {
+            const newSkillDiv = document.createElement('div');
+            newSkillDiv.classList.add('input-container');
+
+            const newInput = document.createElement('input');
+            newInput.type = 'text';
+            newInput.required = 'required';
+            newInput.name = 'skills[]'; // Array notation for multiple values
+            newInput.placeholder = 'Enter skill';
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.type = 'button';
+            deleteBtn.classList.add('delete-btn');
+            deleteBtn.textContent = 'Delete';
+
+            deleteBtn.addEventListener('click', function() {
+                newSkillDiv.remove();
+            });
+
+            newSkillDiv.appendChild(newInput);
+            newSkillDiv.appendChild(deleteBtn);
+
+            skillsContainer.appendChild(newSkillDiv);
         });
     </script>
 </body>

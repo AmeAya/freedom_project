@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, render_template
 import os
 import fitz
+import spacy
 
 app = Flask(__name__)
 
@@ -20,11 +21,13 @@ def upload_files():
         return jsonify({'error': 'No files part'}), 400
 
     files = request.files.getlist('files')
+    skills = request.form.getlist('skills')
 
     if len(files) == 0:
         return jsonify({'error': 'No files selected'}), 400
 
     file_contents = []
+    extracted_data = []
 
     for file in files:
         if file.filename == '':
@@ -40,6 +43,7 @@ def upload_files():
                 for page_num in range(doc.page_count):
                     page = doc.load_page(page_num)
                     pdf_text += page.get_text()
+                extracted_data.append(analyze_resume(pdf_text, skills))
                 file_contents.append({
                     'filename': file.filename,
                     'filetype': 'pdf',
@@ -55,7 +59,25 @@ def upload_files():
                 'content': 'Non-PDF file uploaded'
             })
 
-    return jsonify({'files': file_contents})
+    return jsonify(extracted_data)
+
+
+def analyze_resume(text, required_skills):
+    # Приведение текста и навыков к нижнему регистру
+    text = text.lower()
+    required_skills = [skill.lower() for skill in required_skills]
+
+    # Поиск навыков в тексте (с учетом частичных совпадений)
+    skills_found = [skill for skill in required_skills if skill in text]
+    matched_skills = list(set(skills_found))  # Уникальные совпадения навыков
+
+    # Расчет процента совпадений
+    matched_percent = (len(matched_skills) / len(required_skills)) * 100 if required_skills else 0.0
+
+    return {
+        "skills_found": matched_skills,
+        "matched_percent": matched_percent
+    }
 
 
 if __name__ == '__main__':
