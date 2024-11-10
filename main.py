@@ -45,7 +45,7 @@ def upload_files():
                 for page_num in range(doc.page_count):
                     page = doc.load_page(page_num)
                     pdf_text += page.get_text()
-                extracted_data.append(analyze_resume(pdf_text, skills))
+                extracted_data.append(analyze_resume(file.filename, pdf_text, skills))
                 file_contents.append({
                     'filename': file.filename,
                     'filetype': 'pdf',
@@ -60,11 +60,10 @@ def upload_files():
                 'filetype': 'unknown',
                 'content': 'Non-PDF file uploaded'
             })
+    return render_template('results.html', data=extracted_data)
 
-    return json.dumps(extracted_data, ensure_ascii=False).encode('utf8')
 
-
-def analyze_resume(text, required_skills):
+def analyze_resume(filename, text, required_skills):
     # Приведение текста и навыков к нижнему регистру
     text = text.lower()
     required_skills = [skill.lower() for skill in required_skills]
@@ -77,6 +76,7 @@ def analyze_resume(text, required_skills):
     matched_percent = (len(matched_skills) / len(required_skills)) * 100 if required_skills else 0.0
 
     return {
+        "filename": filename,
         "skills_found": matched_skills,
         "matched_percent": matched_percent
     }
