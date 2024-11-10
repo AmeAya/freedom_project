@@ -4,6 +4,7 @@ import fitz
 import spacy
 
 app = Flask(__name__)
+nlp = spacy.load("ru_core_news_sm")
 
 UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
