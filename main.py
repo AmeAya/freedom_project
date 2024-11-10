@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, render_template
 import os
 import fitz
 import spacy
+import json
 
 app = Flask(__name__)
 nlp = spacy.load("ru_core_news_sm")
@@ -22,7 +23,7 @@ def upload_files():
         return jsonify({'error': 'No files part'}), 400
 
     files = request.files.getlist('files')
-    skills = request.form.getlist('skills')
+    skills = request.form.getlist('skills[]')
 
     if len(files) == 0:
         return jsonify({'error': 'No files selected'}), 400
@@ -60,7 +61,7 @@ def upload_files():
                 'content': 'Non-PDF file uploaded'
             })
 
-    return jsonify(extracted_data)
+    return json.dumps(extracted_data, ensure_ascii=False).encode('utf8')
 
 
 def analyze_resume(text, required_skills):
